@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Looper</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>Looper</h1>
+      <div id="status-bar">
+        <span id="state-label">Ready</span>
+        <span id="latency-display" class="latency-badge hidden">— ms</span>
+      </div>
+    </header>
+
+    <main>
+      <!-- Init gate: AudioContext requires a user gesture on iOS -->
+      <div id="init-screen">
+        <p>Tap to start</p>
+        <button id="init-btn" class="btn btn-primary btn-xl">Start</button>
+      </div>
+
+      <!-- Main controls (hidden until audio is initialized) -->
+      <div id="controls" class="hidden">
+        <section id="calibration-section">
+          <button id="calibrate-btn" class="btn btn-secondary">Calibrate Latency</button>
+          <div id="calibration-progress" class="hidden">
+            <div class="progress-bar">
+              <div id="calibration-fill" class="progress-fill"></div>
+            </div>
+            <span id="calibration-status">Trial 0 / 5</span>
+          </div>
+        </section>
+
+        <section id="record-section">
+          <button id="record-btn" class="btn btn-record btn-xl" disabled>
+            <span class="btn-icon">&#9679;</span>
+            <span class="btn-label">Record</span>
+          </button>
+        </section>
+
+        <section id="playback-section">
+          <button id="play-btn" class="btn btn-play btn-xl" disabled>
+            <span class="btn-icon">&#9654;</span>
+            <span class="btn-label">Play All</span>
+          </button>
+          <button id="stop-btn" class="btn btn-stop btn-xl" disabled>
+            <span class="btn-icon">&#9632;</span>
+            <span class="btn-label">Stop</span>
+          </button>
+        </section>
+      </div>
+
+      <!-- Track list -->
+      <div id="track-list" class="hidden">
+        <h2>Tracks</h2>
+        <ul id="tracks"></ul>
+      </div>
+    </main>
+  </div>
+
+  <script src="calibration.js"></script>
+  <script src="recorder.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
