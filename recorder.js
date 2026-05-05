@@ -17,6 +17,7 @@ class Track {
     this.sampleRate = sampleRate;
     this.muted = false;
     this.duration = audioBuffer.duration; // seconds
+    this.delayMs = 0;                     // per-track playback delay offset
   }
 }
 
@@ -98,24 +99,65 @@ class MultiTrackRecorder {
 
   // ── Playback ──────────────────────────────────────────────
 
+  /**
+   * Play all unmuted tracks in a continuous loop, synced to the first track's
+   * duration as the master loop length. Used during recording so the performer
+   * hears the existing layers while laying down a new one.
+   */
+  playAllLooping() {
+    if (this._isPlaying) this.stopPlayback();
+
+    const unmuted = this.tracks.filter(t => !t.muted);
+    if (unmuted.length === 0) return;
+
+    // The first track sets the master loop length.
+    const loopDuration = this.tracks[0].duration;
+    const startTime = this.ctx.currentTime + 0.05;
+    this._activeSources = [];
+
+    unmuted.forEach(track => {
+      const src = this.ctx.createBufferSource();
+      src.buffer = track.buffer;
+      src.loop = true;
+      src.loopStart = 0;
+      // Clamp loopEnd to the track's actual duration so shorter tracks
+      // loop correctly within the master window.
+      src.loopEnd = Math.min(loopDuration, track.duration);
+      src.connect(this.ctx.destination);
+      // Apply positive delay only during looped monitoring — negative offsets
+      // within a loop would shift the phase unpredictably.
+      const trackDelay = Math.max(0, track.delayMs) / 1000;
+      src.start(startTime + trackDelay);
+      this._activeSources.push(src);
+    });
+
+    this._isPlaying = true;
+    // No auto-end timer — caller stops this explicitly (e.g. when recording stops).
+  }
+
   playAll() {
     if (this._isPlaying) this.stopPlayback();
 
     const unmuted = this.tracks.filter(t => !t.muted);
     if (unmuted.length === 0) return;
 
-    // Schedule all tracks to start slightly in the future so they're truly simultaneous.
-    const startTime = this.ctx.currentTime + 0.05;
-    let endTime = startTime;
+    const baseTime = this.ctx.currentTime + 0.05;
+
+    // Shift all delays relative to the most-negative one so the earliest track
+    // always starts at baseTime and negative delays are handled correctly.
+    var minDelay = unmuted.reduce(function(min, t) { return Math.min(min, t.delayMs); }, 0);
+
+    var endTime = baseTime;
     this._activeSources = [];
 
     unmuted.forEach(track => {
       const src = this.ctx.createBufferSource();
       src.buffer = track.buffer;
       src.connect(this.ctx.destination);
-      src.start(startTime);
+      const trackStart = baseTime + (track.delayMs - minDelay) / 1000;
+      src.start(trackStart);
       this._activeSources.push(src);
-      endTime = Math.max(endTime, startTime + track.duration);
+      endTime = Math.max(endTime, trackStart + track.duration);
     });
 
     this._isPlaying = true;
@@ -129,14 +171,19 @@ class MultiTrackRecorder {
     }, playDurationMs + 200);
   }
 
-  stopPlayback() {
+  /**
+   * @param {boolean} [silent] - if true, suppress the onPlaybackEnd callback.
+   *   Used when stopping looping playback mid-recording so the recording
+   *   state isn't clobbered.
+   */
+  stopPlayback(silent = false) {
     clearTimeout(this._playbackTimer);
     this._activeSources.forEach(src => {
       try { src.stop(); } catch (_) {}
     });
     this._activeSources = [];
     this._isPlaying = false;
-    this.onPlaybackEnd && this.onPlaybackEnd();
+    if (!silent) this.onPlaybackEnd && this.onPlaybackEnd();
   }
 
   // ── Track management ──────────────────────────────────────

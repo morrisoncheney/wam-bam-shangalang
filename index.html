@@ -25,6 +25,11 @@
 
       <!-- Main controls (hidden until audio is initialized) -->
       <div id="controls" class="hidden">
+        <section id="mic-section">
+          <label class="select-label" for="mic-select">Microphone</label>
+          <select id="mic-select" class="mic-select"></select>
+        </section>
+
         <section id="calibration-section">
           <button id="calibrate-btn" class="btn btn-secondary">Calibrate Latency</button>
           <div id="calibration-progress" class="hidden">
@@ -61,6 +66,8 @@
       </div>
     </main>
   </div>
+
+  <button id="save-btn" class="btn-save hidden" title="Save mix as WAV">&#8681;</button>
 
   <script src="calibration.js"></script>
   <script src="recorder.js"></script>

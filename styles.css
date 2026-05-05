@@ -211,8 +211,9 @@ section {
   border-radius: var(--radius-sm);
   padding: 12px 14px;
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  gap: 0;
+  transition: border-color 0.2s;
 }
 
 .track-label {
@@ -250,6 +251,176 @@ section {
 .track-btn.delete-btn {
   color: var(--accent);
   border-color: rgba(255,59,48,0.3);
+}
+
+/* ── Track rows & delay dial ──────────────────────────────── */
+.track-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.track-item.expanded {
+  border-color: var(--accent3);
+}
+
+.track-expand-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  transition: transform 0.2s;
+}
+
+.track-item.expanded .track-expand-btn {
+  transform: rotate(180deg);
+  color: var(--accent3);
+}
+
+.track-detail {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.delay-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.delay-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-dim);
+}
+
+.delay-readout {
+  font-size: 1.3rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent3);
+  min-width: 80px;
+  text-align: center;
+}
+
+.dial {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #2e2e2e, #111);
+  border: 2px solid var(--border);
+  position: relative;
+  cursor: grab;
+  touch-action: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+  transition: border-color 0.15s;
+}
+
+.dial:active {
+  cursor: grabbing;
+  border-color: var(--accent3);
+}
+
+.dial-indicator {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 16px;
+  background: var(--accent3);
+  border-radius: 2px;
+  box-shadow: 0 0 6px var(--accent3);
+}
+
+/* Small badge shown in the collapsed track row when delay != 0 */
+.delay-badge-inline {
+  font-size: 0.72rem;
+  color: var(--accent3);
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.delay-badge-inline.visible {
+  opacity: 1;
+}
+
+/* ── Mic selector ─────────────────────────────────────────── */
+#mic-section {
+  gap: 8px;
+}
+
+.select-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-dim);
+}
+
+.mic-select {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  cursor: pointer;
+}
+
+.mic-select:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Save FAB ─────────────────────────────────────────────── */
+.btn-save {
+  position: fixed;
+  bottom: 28px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  transition: background 0.15s, transform 0.1s, opacity 0.2s;
+  z-index: 100;
+}
+
+.btn-save:active {
+  transform: scale(0.93);
+}
+
+.btn-save:hover {
+  background: var(--surface);
+  border-color: var(--accent3);
+  color: var(--accent3);
 }
 
 /* ── Utility ──────────────────────────────────────────────── */
