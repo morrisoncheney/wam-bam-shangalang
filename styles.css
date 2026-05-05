@@ -397,30 +397,91 @@ section {
   position: fixed;
   bottom: 28px;
   right: 24px;
-  width: 56px;
-  height: 56px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   background: var(--surface2);
   border: 1px solid var(--border);
-  color: var(--text);
-  font-size: 1.5rem;
+  color: var(--text-dim);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-  transition: background 0.15s, transform 0.1s, opacity 0.2s;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  transition: color 0.15s, border-color 0.15s, transform 0.1s;
   z-index: 100;
 }
 
-.btn-save:active {
-  transform: scale(0.93);
+.btn-save:hover {
+  color: var(--accent3);
+  border-color: var(--accent3);
 }
 
-.btn-save:hover {
+.btn-save:active {
+  transform: scale(0.91);
+}
+
+/* ── Save modal ───────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 24px;
+}
+
+.modal {
   background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 24px 20px;
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.modal-subtitle {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  margin: -8px 0 0;
+}
+
+.modal-input {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.modal-input:focus {
   border-color: var(--accent3);
-  color: var(--accent3);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.modal-actions .btn {
+  flex: 1;
+  padding: 13px;
 }
 
 /* ── Utility ──────────────────────────────────────────────── */

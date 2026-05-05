@@ -21,8 +21,12 @@
   const stopBtn      = document.getElementById('stop-btn');
   const trackList    = document.getElementById('track-list');
   const tracksEl     = document.getElementById('tracks');
-  const micSelect    = document.getElementById('mic-select');
-  const saveBtn      = document.getElementById('save-btn');
+  const micSelect      = document.getElementById('mic-select');
+  const saveBtn        = document.getElementById('save-btn');
+  const saveModal      = document.getElementById('save-modal');
+  const saveFilename   = document.getElementById('save-filename');
+  const saveCancelBtn  = document.getElementById('save-cancel-btn');
+  const saveConfirmBtn = document.getElementById('save-confirm-btn');
 
   // ── State ─────────────────────────────────────────────────
   let audioCtx = null;
@@ -452,24 +456,47 @@
     }
   }
 
-  // ── Save mix ──────────────────────────────────────────────
+  // ── Save modal ────────────────────────────────────────────
   saveBtn.addEventListener('click', function() {
     var unmuted = recorder.tracks.filter(function(t) { return !t.muted; });
     if (unmuted.length === 0) { alert('No unmuted tracks to save.'); return; }
+    saveFilename.value = '';
+    saveModal.classList.remove('hidden');
+    saveFilename.focus();
+  });
 
+  saveCancelBtn.addEventListener('click', function() {
+    saveModal.classList.add('hidden');
+  });
+
+  // Close on backdrop click
+  saveModal.addEventListener('click', function(e) {
+    if (e.target === saveModal) saveModal.classList.add('hidden');
+  });
+
+  // Allow Enter key to confirm
+  saveFilename.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') saveConfirmBtn.click();
+    if (e.key === 'Escape') saveModal.classList.add('hidden');
+  });
+
+  saveConfirmBtn.addEventListener('click', function() {
+    var rawName = saveFilename.value.trim();
+    // Fall back to a default if the field is empty; strip characters
+    // that are illegal in filenames on common operating systems.
+    var safeName = (rawName || 'looper-mix').replace(/[/\\?%*:|"<>]/g, '-');
+    var filename = safeName + '.wav';
+
+    var unmuted = recorder.tracks.filter(function(t) { return !t.muted; });
     var sampleRate = audioCtx.sampleRate;
-
-    // Align delays the same way playback does.
     var minDelay = unmuted.reduce(function(min, t) { return Math.min(min, t.delayMs || 0); }, 0);
 
-    // Calculate total output length in samples.
     var totalSamples = 0;
     unmuted.forEach(function(track) {
-      var startSample = Math.round((( track.delayMs || 0) - minDelay) / 1000 * sampleRate);
+      var startSample = Math.round(((track.delayMs || 0) - minDelay) / 1000 * sampleRate);
       totalSamples = Math.max(totalSamples, startSample + track.buffer.length);
     });
 
-    // Mix all tracks into a single float32 array.
     var mix = new Float32Array(totalSamples);
     unmuted.forEach(function(track) {
       var startSample = Math.round(((track.delayMs || 0) - minDelay) / 1000 * sampleRate);
@@ -479,19 +506,19 @@
       }
     });
 
-    // Clip to [-1, 1] to prevent WAV overflow.
     for (var i = 0; i < mix.length; i++) {
       mix[i] = Math.max(-1, Math.min(1, mix[i]));
     }
 
-    // Encode as 16-bit mono WAV and trigger download.
     var wav = encodeWAV(mix, sampleRate);
     var url = URL.createObjectURL(wav);
     var a = document.createElement('a');
     a.href = url;
-    a.download = 'looper-mix.wav';
+    a.download = filename;
     a.click();
     URL.revokeObjectURL(url);
+
+    saveModal.classList.add('hidden');
   });
 
   function encodeWAV(samples, sampleRate) {

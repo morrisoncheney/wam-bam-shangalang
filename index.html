@@ -67,7 +67,25 @@
     </main>
   </div>
 
-  <button id="save-btn" class="btn-save hidden" title="Save mix as WAV">&#8681;</button>
+  <button id="save-btn" class="btn-save hidden" title="Save mix as WAV">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M11 3v11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <path d="M6 9.5l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M3 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <div id="save-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <h3 class="modal-title">Save Mix</h3>
+      <p class="modal-subtitle">Name your file</p>
+      <input id="save-filename" class="modal-input" type="text" placeholder="my-loop" maxlength="80" autocomplete="off" spellcheck="false" />
+      <div class="modal-actions">
+        <button id="save-cancel-btn" class="btn btn-secondary">Cancel</button>
+        <button id="save-confirm-btn" class="btn btn-primary">Download</button>
+      </div>
+    </div>
+  </div>
 
   <script src="calibration.js"></script>
   <script src="recorder.js"></script>
